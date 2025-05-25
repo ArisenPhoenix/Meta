@@ -1,4 +1,2 @@
-*tests*
-*test
-test*
-.idea
+tests.py
+test_schema_validation.py

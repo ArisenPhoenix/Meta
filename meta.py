@@ -17,8 +17,7 @@ def is_instance_of_union(value, union_type):
         return any(isinstance(value, t) for t in get_args(union_type))
     return False
 
-
-
+ 
 class Meta:
     def __new__(cls, data: META_TYPES, schema: Any = None, **kwargs) -> META_TYPES:
         # Step 1: Normalize schema
