@@ -20,11 +20,9 @@ def is_instance_of_union(value, union_type):
  
 class Meta:
     def __new__(cls, data: META_TYPES, schema: Any = None, **kwargs) -> META_TYPES:
-        # Step 1: Normalize schema
         kwargs = kwargs if kwargs else {}
         schema_obj = schema if isinstance(schema, Schema) else Schema(schema, **kwargs)
 
-        # Step 2: Handle optional schema merging
         if kwargs.get("additional"):
             schema_obj = Schema(Meta._merge_additional_schema(schema_obj.schema, kwargs["additional"]), **kwargs)
 
@@ -32,11 +30,8 @@ class Meta:
         if fill_defaults and isinstance(data, dict) and isinstance(schema_obj.schema, dict):
             fill_missing_keys(data, schema_obj.schema)
 
-        # Step 4: Coerce keys
-        # data = coerce_dict_keys(data, schema_obj.schema)
         data = normalize_data(data, schema_obj.schema)
 
-        # Step 5: Wrap structure recursively
         try:
             wrapped = wrap_meta_structure(data, schema=schema_obj, **kwargs)
         except Exception as e:
@@ -44,8 +39,6 @@ class Meta:
             print("DATA: ", data)
             print("SCHEMA: ", schema_obj.schema)
             exit(0)
-
-        # Optional: assign top-level schema for later introspection
         cls.schema = schema_obj
 
 
@@ -72,7 +65,6 @@ class Meta:
 
         return annotations
 
-    # from typing import Any, Dict, List, Set, Tuple, Union, get_args, get_origin
     @staticmethod
     def deduce_schema(data: Any, additional: Any = None) -> Any:
         def _deduce(value):
@@ -222,6 +214,7 @@ class Meta:
         schema = Meta.deduce_schema(data)
         return Meta(data, schema, **kwargs)
 
+    # stubs for supporting the class API, for proper clarity
     def get(self, key: Any, default: Optional[Any] = None) -> Union[MetaNodeMixin, Any]:
         ...
 

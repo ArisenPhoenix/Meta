@@ -64,10 +64,6 @@ def create_meta_node_class(container_type: Type, name: str = None):
     if container_type in (str, int, float, type(None)):
         class MetaScalar(container_type, MetaNodeMixin):
             def __new__(cls, value, schema=None, **kwargs):
-                # instance = super().__new__(cls, value)
-                # instance.schema = schema
-                # instance.validator = SchemaValidator(schema, MetaNodeMixin)
-                # instance.validator.type_check(value, schema, key_path=name)
                 assert isinstance(schema, Schema), "Expected Schema instance"
 
                 instance = super().__new__(cls, value)
@@ -129,7 +125,6 @@ def create_meta_node_class(container_type: Type, name: str = None):
 
             data = data if data is not None else default_factory()
             self.schema = schema
-            # meta_type = META_TYPE_MAP[type(data)]
             self.validator = SchemaValidator(schema, MetaNodeMixin)
             if container_type is tuple:
                 # All init work was already done in __new__
@@ -137,9 +132,7 @@ def create_meta_node_class(container_type: Type, name: str = None):
 
             if isinstance(self, dict) and isinstance(data, dict):
 
-                # data = coerce_dict_keys(data, schema)
                 for k, v in data.items():
-                    # k = self._coerce_key_type(k)
                     coerced_k = self._coerce_key_type(k)
                     resolved = Schema.ensure(self.resolve_schema(coerced_k, v))
                     if isinstance(v, dict) and isinstance(resolved, dict):
@@ -195,36 +188,6 @@ def create_meta_node_class(container_type: Type, name: str = None):
                     return key == "True"
             return key
 
-        # def resolve_schema(self, key, value):
-        #     key = self._coerce_key_type(key)
-        #
-        #     if self.validator and isinstance(self.schema, dict):
-        #         # --- Match exact key ---
-        #         if key in self.schema:
-        #             return self.schema[key]
-        #
-        #         # --- Match by key type (e.g., str, int) ---
-        #         for k_type, v_type in self.schema.items():
-        #             if isinstance(k_type, type) and isinstance(key, k_type):
-        #                 return v_type
-        #             if isinstance(k_type, tuple) and any(isinstance(key, t) for t in k_type):
-        #                 return v_type
-        #
-        #     # --- Handle typing.Dict[str, T] form ---
-        #     origin = get_origin(self.schema)
-        #     if origin is dict:
-        #         _, val_type = get_args(self.schema)
-        #         return val_type
-        #
-        #     # --- Normalized schema form: {str: T} ---
-        #     if isinstance(self.schema, dict):
-        #         for k_type, v_type in self.schema.items():
-        #             if isinstance(k_type, type) and isinstance(key, k_type):
-        #                 return v_type
-        #             if isinstance(k_type, tuple) and any(isinstance(key, t) for t in k_type):
-        #                 return v_type
-        #
-        #     return None
         def resolve_schema(self, key, value):
             key = self._coerce_key_type(key)
 
@@ -447,34 +410,6 @@ def create_meta_node_class(container_type: Type, name: str = None):
             else:
                 raise NotImplementedError()
 
-        # def update(self, *args, **kwargs):
-        #     other, v = self._pull_args(*args)
-        #
-        #     if container_type is dict:
-        #         if not hasattr(other, "items"):
-        #             raise TypeError(f"Expected dict-like input for MetaDict.update(), got {type(other)}")
-        #
-        #         for k, v in other.items():
-        #             resolved = Schema.ensure(self.resolve_schema(k, v))
-        #             print(f"[DEBUG] Resolved schema for key={k} → {resolved}")
-        #
-        #             wrapped = wrap_meta_structure(v, resolved)
-        #             if get_origin(self.schema) is dict:
-        #                 expected_key_type, value_type = get_args(self.schema)
-        #                 if not isinstance(k, expected_key_type):
-        #                     raise TypeError(f"[❌] Invalid key type: {type(k)} → expected {expected_key_type}")
-        #             dict.__setitem__(self, k, wrapped)
-        #
-        #     elif container_type is list:
-        #         for v in other:
-        #             self.add(None, v)
-        #     elif container_type is set:
-        #         for v in other:
-        #             self.add(None, v)
-        #     else:
-        #         raise NotImplementedError()
-        #
-        #     return self
         def update(self, *args, **kwargs):
             other, v = self._pull_args(*args)
 
@@ -563,14 +498,6 @@ def create_meta_node_class(container_type: Type, name: str = None):
             else:
                 # probably a scalar
                 return self.to_json()
-
-        # def validate(self):
-        #     if not hasattr(self, "schema") or self.schema is None:
-        #         raise ValueError("No schema associated with this node.")
-        #     validator = SchemaValidator(self.schema, MetaNodeMixin)
-        #     validator.validate_all(self)
-
-
 
         def ensure_iterable(self, v):
             if isinstance(v, (list, set, tuple)):
@@ -759,7 +686,6 @@ def wrap_meta_structure(data: Any, schema: Any = None, **kwargs):
                     for i in data
                 ]
                 node = meta_cls(container_data if base_type != set else set(container_data), schema=schema_obj, **kwargs)
-                # node.schema = schema_obj
                 validator = schema_obj.build_validator()
                 if validator:
                     validator.validate_all(node)

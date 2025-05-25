@@ -49,7 +49,6 @@ def is_type_match(value, expected_type, base_class) -> bool:
     if isinstance(expected_type, type):
         return isinstance(value, expected_type)
 
-    # Generic fallback for things like typing.Any
     return True
 
 def resolve_schema_key(key, schema):
@@ -64,13 +63,10 @@ def resolve_schema_key(key, schema):
         _, value_type = args
         return value_type
 
-    # ✅ Explicit schema dict, like {"name": str, str: int}
     if isinstance(schema, dict):
-        # 1. Try direct key match
         if key in schema:
             return schema[key]
 
-        # 2. Try matching by key type
         for k_type, v_type in schema.items():
             if isinstance(k_type, type) and isinstance(key, k_type):
                 return v_type
@@ -98,8 +94,6 @@ def validate_container_origins(origin, value, args, path, validate_type):
         for k, v in value.items():
             validate_type(key_type, k, path=f"{path}.key")
             validate_type(key_type, k, path=f"{path}.k")
-            # self._validate_type(key_type, k, path=f"{path}.key")
-            # self._validate_type(val_type, v, path=f"{path}.{k}")
         return
 
 
@@ -108,7 +102,6 @@ def validate_dict(expected, value, path, validate_type):
     if isinstance(expected, dict) and isinstance(value, dict):
         for k, sub_schema in expected.items():
             if k in value:
-                # self._validate_type(sub_schema, value[k], path=f"{path}.{k}")
                 validate_type(sub_schema, value[k], path=f"{path}.{k}")
         return
 
@@ -116,7 +109,6 @@ def validate_list(expected, value, path, validate_type):
     if isinstance(expected, list) and isinstance(value, list):
         subtype = expected[0] if expected else Any
         for i, item in enumerate(value):
-            # self._validate_type(subtype, item, path=f"{path}[{i}]")
             validate_type(subtype, item, path=f"{path}[{i}]")
         return
 
@@ -124,7 +116,6 @@ def validate_set(expected, value, path, validate_type):
     if isinstance(expected, set) and isinstance(value, set):
         subtype = next(iter(expected)) if expected else Any
         for item in value:
-            # self._validate_type(subtype, item, path=f"{path}{{{item}}}")
             validate_type(subtype, item, path=f"{path}{{{item}}}")
         return
 
@@ -147,7 +138,7 @@ def is_key_instance_of_type(key, key_type) -> bool:
 
 
 def get_default_from_type(tp):
-    # ✅ Handle tuple of types (e.g., Union)
+    # ✅ Handle tuple of types i.e Union
     if isinstance(tp, tuple):
         return get_default_from_type(tp[0])  # choose first type as fallback
 
@@ -231,7 +222,7 @@ def coerce_dict_keys(data: dict, schema: Any) -> dict:
             if isinstance(v, list):
                 coerced_v = set(expected_type(item) for item in v)
             else:
-                coerced_v = v if isinstance(v, set) else set([expected_type(v)])
+                coerced_v = v if isinstance(v, set) else {expected_type(v)}
 
         elif isinstance(subschema, list):
             expected_type = subschema[0] if subschema else Any
@@ -406,108 +397,4 @@ def normalize_data(data: Any, schema: Any) -> Any:
             return data
 
     return data
-
-
-
-#
-# def normalize_typed_dict(data: Any, schema_dict: dict) -> dict:
-#     if not isinstance(data, dict):
-#         raise TypeError(f"Expected dict for TypedDict-style schema, got {type(data)}")
-#
-#     result = {}
-#     for k, v in data.items():
-#         matched_schema = None
-#         coerced_key = k  # Default if no match
-#
-#         for sk, sv in schema_dict.items():
-#             if sk == k:
-#                 matched_schema = sv
-#                 break
-#             elif isinstance(sk, type):
-#                 try:
-#                     coerced = sk(k) if isinstance(k, str) else k
-#                     if isinstance(coerced, sk):
-#                         coerced_key = coerced
-#                         matched_schema = sv
-#                         break
-#                 except Exception:
-#                     continue
-#             elif isinstance(sk, tuple):
-#                 for t in sk:
-#                     try:
-#                         coerced = t(k) if isinstance(k, str) else k
-#                         if isinstance(coerced, t):
-#                             coerced_key = coerced
-#                             matched_schema = sv
-#                             break
-#                     except Exception:
-#                         continue
-#                 if matched_schema:
-#                     break
-#
-#         # ✅ Ensure value is normalized recursively
-#         result[coerced_key] = normalize_data(v, matched_schema or Any)
-#
-#     return result
-#
-#
-#
-# def normalize_set(data: Any, item_type: Any = Any) -> set:
-#     if isinstance(data, (list, set)):
-#         return {normalize_data(i, item_type) for i in data}
-#     raise TypeError(f"Expected set or list, got {type(data)}")
-#
-#
-# def normalize_list(data: Any, item_type: Any = Any) -> list:
-#     if not isinstance(data, list):
-#         raise TypeError(f"Expected list, got {type(data)}")
-#     return [normalize_data(i, item_type) for i in data]
-#
-#
-# def normalize_tuple(data: Any, args: tuple) -> tuple:
-#     if isinstance(data, list):
-#         data = tuple(data)
-#     if not isinstance(data, tuple):
-#         raise TypeError(f"Expected tuple, got {type(data)}")
-#     if args and args[-1] is Ellipsis:
-#         return tuple(normalize_data(i, args[0]) for i in data)
-#     return tuple(normalize_data(i, s) for i, s in zip(data, args))
-#
-#
-# def coerce_scalar(data: Any, typ: type) -> Any:
-#     try:
-#         return typ(data)
-#     except Exception:
-#         return data
-
-#
-# def normalize_data(data: Any, schema: Any) -> Any:
-#     origin = get_origin(schema)
-#     args = get_args(schema)
-#
-#     if isinstance(schema, dict):
-#         return normalize_typed_dict(data, schema)
-#
-#     if origin is dict:
-#         key_type, val_type = args if len(args) == 2 else (Any, Any)
-#         return normalize_dict(data, key_type, val_type)
-#
-#     if origin is set:
-#         (item_type,) = args if args else (Any,)
-#         return normalize_set(data, item_type)
-#
-#     if origin is list:
-#         (item_type,) = args if args else (Any,)
-#         return normalize_list(data, item_type)
-#
-#     if origin is tuple:
-#         return normalize_tuple(data, args)
-#
-#     if isinstance(schema, type):
-#         return coerce_scalar(data, schema)
-#
-#     return data
-
-
-
 

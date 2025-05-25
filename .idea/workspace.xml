@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a66128c3-3dd4-4a3b-80f7-d26310925190" name="Changes" comment="" />
+    <list default="true" id="a66128c3-3dd4-4a3b-80f7-d26310925190" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/meta.py" beforeDir="false" afterPath="$PROJECT_DIR$/meta.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/meta_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/meta_base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/meta_core.py" beforeDir="false" afterPath="$PROJECT_DIR$/meta_core.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schema_validator.py" beforeDir="false" afterPath="$PROJECT_DIR$/schema_validator.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,9 +21,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="2xZLHQ4hZ27VSMW1mKABqqpFuEm" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -25,6 +33,8 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
     "last_opened_file_path": "/mnt/Internal_HDD/Programming/Python/PycharmProjects/PornDownloader/Meta",
     "settings.editor.selected.configurable": "preferences.pathVariables"
   }

@@ -12,8 +12,6 @@ def fill_missing_keys(data: dict, schema: dict):
             data[key] = get_default_from_type(expected_type)
         elif isinstance(data[key], dict) and isinstance(expected_type, dict):
             fill_missing_keys(data[key], expected_type)
-# Step 3: Fill defaults (before wrapping)
-
 
 class Schema:
     def __init__(self, raw_schema: Any, *, validator_cls=SchemaValidator, **kwargs):
@@ -174,8 +172,6 @@ class Schema:
         resolved = self.resolve_from(key, data, level, validate=validate)
         return resolved
 
-    # def build_validator(self):
-    #     return self.validator(self.schema, **self._validator_kwargs) if self.validator else NoOpValidator()
     def build_validator(self):
         if not self._validate:
             return NoOpValidator()

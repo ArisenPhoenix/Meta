@@ -96,7 +96,7 @@ class MetaNodeMixin:
 
 
 
-# types cannot be subclassed directly
+# types that cannot be subclassed directly
 # --- MetaBool: Subclass of int with bool behavior ---
 class MetaBool(int, MetaNodeMixin):
     def __new__(cls, value: Union[bool, int], schema=None):

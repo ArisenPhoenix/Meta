@@ -178,14 +178,12 @@ class SchemaValidator:
                     return arg
 
                 # Otherwise validate normally
-                # self.type_check(value, arg)
                 for curr_arg in get_args(union_type):
                     try:
                         SchemaValidator(curr_arg, self.MetaNodeMixin).validate_all(value)
                         return curr_arg
                     except TypeError:
                         continue
-                # Otherwise validate normally
                 self.type_check(value, arg)
 
             except TypeError:
@@ -229,7 +227,6 @@ class SchemaValidator:
         if expected_type is None:
             return None
 
-        # unwrapped = value.to_native() if isinstance(value, self.MetaNodeMixin) else value
         self.type_check(value, expected_type, key_path)
 
         origin = get_origin(expected_type)
@@ -313,8 +310,6 @@ class SchemaValidator:
                     print("Failed with schema: ", self.schema)
                     raise TypeError(f"[❌] Key '{k}' not allowed by schema")
 
-        # print(f"✅ [validate_all] Validating full structure against schema: {expected_type}")
-
         if isinstance(data, self.MetaNodeMixin):
             self._validate_meta(data, expected_type)
         else:
@@ -353,53 +348,3 @@ class SchemaValidator:
         # --- Fallback: hard fail ---
         raise TypeError(f"{path}: Unsupported schema type {expected}")
 
-
-
-
-
-
-
-
-
-
-
- # def validate_recursive(self, key_path, value, expected_type=None):
-    #     if expected_type is None:
-    #         expected_type = resolve_schema_key(key_path, self.schema)
-    #
-    #     origin = get_origin(expected_type)
-    #     if origin in (list, set, dict):
-    #         return self.validate_container(key_path, value, expected_type)
-    #
-    #     if origin is tuple:
-    #         return self.validate_tuple(key_path, value, expected_type)
-    #
-    #     return self.validate_scalar(key_path, value, expected_type)
-
-
-
-
-
-
- # def schema_for(self, key):
-    #     schema = self.schema
-    #
-    #     # 🔍 Support Union[dict, dict] or other combinations
-    #     if is_union(schema):
-    #         return self.resolve_union_branch_schema_for(key, schema)
-    #
-    #     # --- Dict[str, T] ---
-    #     if isinstance(schema, dict):
-    #         if key in schema:
-    #             return schema[key]
-    #         for k_type, v_type in schema.items():
-    #             if isinstance(k_type, type) and isinstance(key, k_type):
-    #                 return v_type
-    #         raise TypeError(f"[❌] Key '{key}' is not allowed by schema {schema}")
-    #
-    #     origin = get_origin(schema)
-    #     if origin in (dict, Dict):
-    #         args = get_args(schema)
-    #         return args[1] if len(args) == 2 else args[0]
-    #
-    #     raise TypeError(f"[❌] Schema does not support keys: {schema}")
